@@ -1,5 +1,76 @@
+/******/ (function(modules) { // webpackBootstrap
+/******/ 	// The module cache
+/******/ 	var installedModules = {};
+/******/
+/******/ 	// The require function
+/******/ 	function __webpack_require__(moduleId) {
+/******/
+/******/ 		// Check if module is in cache
+/******/ 		if(installedModules[moduleId]) {
+/******/ 			return installedModules[moduleId].exports;
+/******/ 		}
+/******/ 		// Create a new module (and put it into the cache)
+/******/ 		var module = installedModules[moduleId] = {
+/******/ 			i: moduleId,
+/******/ 			l: false,
+/******/ 			exports: {}
+/******/ 		};
+/******/
+/******/ 		// Execute the module function
+/******/ 		modules[moduleId].call(module.exports, module, module.exports, __webpack_require__);
+/******/
+/******/ 		// Flag the module as loaded
+/******/ 		module.l = true;
+/******/
+/******/ 		// Return the exports of the module
+/******/ 		return module.exports;
+/******/ 	}
+/******/
+/******/
+/******/ 	// expose the modules object (__webpack_modules__)
+/******/ 	__webpack_require__.m = modules;
+/******/
+/******/ 	// expose the module cache
+/******/ 	__webpack_require__.c = installedModules;
+/******/
+/******/ 	// identity function for calling harmony imports with the correct context
+/******/ 	__webpack_require__.i = function(value) { return value; };
+/******/
+/******/ 	// define getter function for harmony exports
+/******/ 	__webpack_require__.d = function(exports, name, getter) {
+/******/ 		if(!__webpack_require__.o(exports, name)) {
+/******/ 			Object.defineProperty(exports, name, {
+/******/ 				configurable: false,
+/******/ 				enumerable: true,
+/******/ 				get: getter
+/******/ 			});
+/******/ 		}
+/******/ 	};
+/******/
+/******/ 	// getDefaultExport function for compatibility with non-harmony modules
+/******/ 	__webpack_require__.n = function(module) {
+/******/ 		var getter = module && module.__esModule ?
+/******/ 			function getDefault() { return module['default']; } :
+/******/ 			function getModuleExports() { return module; };
+/******/ 		__webpack_require__.d(getter, 'a', getter);
+/******/ 		return getter;
+/******/ 	};
+/******/
+/******/ 	// Object.prototype.hasOwnProperty.call
+/******/ 	__webpack_require__.o = function(object, property) { return Object.prototype.hasOwnProperty.call(object, property); };
+/******/
+/******/ 	// __webpack_public_path__
+/******/ 	__webpack_require__.p = "";
+/******/
+/******/ 	// Load entry module and return exports
+/******/ 	return __webpack_require__(__webpack_require__.s = 3);
+/******/ })
+/************************************************************************/
+/******/ ([
+/* 0 */
+/***/ (function(module, exports, __webpack_require__) {
 
-/**
+/* WEBPACK VAR INJECTION */(function(global, module) {var __WEBPACK_AMD_DEFINE_RESULT__;/**
  * @license
  * Lodash <https://lodash.com/>
  * Copyright JS Foundation and other contributors <https://js.foundation/>
@@ -8,7 +79,7 @@
  * Copyright Jeremy Ashkenas, DocumentCloud and Investigative Reporters & Editors
  */
 ;(function() {
-    let {imgs} = require('script');
+
   /** Used as a safe reference for `undefined` in pre-ES5 environments. */
   var undefined;
 
@@ -17058,7 +17129,7 @@
   var _ = runInContext();
 
   // Some AMD build optimizers, like r.js, check for condition patterns like:
-  if (typeof define == 'function' && typeof define.amd == 'object' && define.amd) {
+  if (true) {
     // Expose Lodash on the global object to prevent errors when Lodash is
     // loaded by a script tag in the presence of an AMD loader.
     // See http://requirejs.org/docs/errors.html#mismatch for more details.
@@ -17067,9 +17138,10 @@
 
     // Define as an anonymous module so, through path mapping, it can be
     // referenced as the "underscore" module.
-    define(function() {
+    !(__WEBPACK_AMD_DEFINE_RESULT__ = function() {
       return _;
-    });
+    }.call(exports, __webpack_require__, exports, module),
+				__WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__));
   }
   // Check for `exports` after `define` in case a build optimizer adds it.
   else if (freeModule) {
@@ -17083,3 +17155,132 @@
     root._ = _;
   }
 }.call(this));
+
+/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(1), __webpack_require__(2)(module)))
+
+/***/ }),
+/* 1 */
+/***/ (function(module, exports) {
+
+var g;
+
+// This works in non-strict mode
+g = (function() {
+	return this;
+})();
+
+try {
+	// This works if eval is allowed (see CSP)
+	g = g || Function("return this")() || (1,eval)("this");
+} catch(e) {
+	// This works if the window reference is available
+	if(typeof window === "object")
+		g = window;
+}
+
+// g can still be undefined, but nothing to do about it...
+// We return undefined, instead of nothing here, so it's
+// easier to handle this case. if(!global) { ...}
+
+module.exports = g;
+
+
+/***/ }),
+/* 2 */
+/***/ (function(module, exports) {
+
+module.exports = function(module) {
+	if(!module.webpackPolyfill) {
+		module.deprecate = function() {};
+		module.paths = [];
+		// module.parent = undefined by default
+		if(!module.children) module.children = [];
+		Object.defineProperty(module, "loaded", {
+			enumerable: true,
+			get: function() {
+				return module.l;
+			}
+		});
+		Object.defineProperty(module, "id", {
+			enumerable: true,
+			get: function() {
+				return module.i;
+			}
+		});
+		module.webpackPolyfill = 1;
+	}
+	return module;
+};
+
+
+/***/ }),
+/* 3 */
+/***/ (function(module, exports, __webpack_require__) {
+
+var _ = __webpack_require__(0);
+
+function init() {
+    gapi.client.setApiKey('AIzaSyB9Y-NxEUbkWCJq1Bu7LM2nCGhmHDEyzFE');
+    gapi.client.load("youtube", "v3", function(){});
+}
+window.onload = function() {
+    init();
+};
+let next = '';
+let prev = '';
+let pages = [];
+let imgs = '';
+let query;
+document.getElementById('next').addEventListener('click', function() {search(next)});
+document.getElementById('prev').addEventListener('click', function() {search(prev)});
+document.getElementById('search-button').addEventListener('click', function() {search()});
+
+// Search for a specified string.
+function search(pageToken) {
+    let request;
+    let results;
+    query = document.getElementById('enterQuery').value;
+    if(pageToken != undefined) {
+        request = gapi.client.youtube.search.list({
+            part: "snippet",
+            type: "video",
+            q: query,
+            order: "rating",
+            pageToken: pageToken
+       });
+    } else {
+        request = gapi.client.youtube.search.list({
+            part: "snippet",
+            type: "video",
+            q: query,
+            order: "rating"
+       });
+    }
+    
+    request.execute(function(response) {
+        results = response.result;
+        console.log(results);
+        if(results.prevPageToken != undefined) {
+            prev = results.prevPageToken;
+        } else {
+            prev = '';
+        }
+        next = results.nextPageToken;
+        imgs = results.items.map(function(item){
+            return item.snippet.thumbnails.default.url;
+        });
+        let tmpl = _.template('<%obj.forEach(function(item){%>\
+                        <li class="default"><img src="<%-item%>" alt="" width="100px" height="100px">\
+                        </li><%});%>');
+        let html = tmpl(imgs);
+        document.getElementById('results').innerHTML = html;
+    });
+}
+module.exports = {
+    imgs
+}
+
+
+
+/***/ })
+/******/ ]);
