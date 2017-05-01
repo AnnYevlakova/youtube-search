@@ -2,35 +2,42 @@
 <html>
     <head>
         <meta charset="utf-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0"/>       
         <title>Youtube search</title>
         <link rel="stylesheet"  href='style/style.css'>
     </head>
 
     
     <body>
+        
         <header>
-            <p>Open Your Universe</p>
+            <h1>Open Your Universe</h1>
         </header>
         <section class="searchField">
-            <label> 
-                <input id="enterQuery" placeholder='Are you looking for awesome video?' type="text"/>
-                <button id="search-button">Search</button>
-            </label>
+            <input id="enterQuery" placeholder='Are you looking for awesome video?' type="text"/>
+            <button id="searchButton">Search</button>
         </section>
         <section class="resultContainer">
-            <ul id="results" class="resultContainer_results">            
+            <ul id="results" class="resultContainer_results">             
             </ul>
         </section>
         <footer>
             <input class="prev" id="prev" type="button" value="prev">
+            <input class="curr" id="curr" type="button" value="1">
             <input class="next" id="next" type="button" value="next">
         </footer>
    
         
        
         
-    
+    <script>
+       document.getElementById('enterQuery').addEventListener('focus',function(){
+            this.setAttribute('placeholder',". . .");
+        });
+       document.getElementById('enterQuery').addEventListener('blur',function(){
+            this.setAttribute('placeholder',"Are you looking for awesome video?");
+        });
+    </script>
     <script src="https://apis.google.com/js/client.js">
     </script>
     <script src='bundle.js'></script>

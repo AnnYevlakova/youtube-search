@@ -1,0 +1,171 @@
+@color: #062084;
+.setContainer(@w, @h, @m, @bc, @b, @c) {
+    width: @w;
+    height: @h;
+    margin: @m;
+    background-color: @bc;
+    color: @c;
+    border: @b;
+}
+
+body {
+    .setContainer(100%, 100%, 0, @color, none, @color);
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: -20;
+    background-image: url(../images/sky.jpg);
+    background-position: left top;
+    background-size: cover;
+    font-size: 14px;
+    padding-bottom: 40px;
+}
+header {
+    max-width: 1200px;
+    margin: 0px auto;
+}
+h1 {
+    text-align: center;
+}
+.searchField {
+    .setContainer(80%, 40px, 10px auto, transparent, 1px solid darken(@color, 10%), inherit);
+    max-width: 1200px;
+    border-radius: 20px;
+}
+#enterQuery {
+    .setContainer(70%, 30px, 4.5px auto 5px 5%, transparent, 1px solid @color, lighten(@color, 20%));
+    border-radius: 15px;
+    padding: 0 0 0 10px;
+    outline: none; 
+}
+#enterQuery::-moz-placeholder {
+  color: lighten(@color, 20%);
+}
+#enterQuery:-ms-input-placeholder {
+  color: lighten(@color, 20%);
+}
+#enterQuery::-webkit-input-placeholder {
+  color: lighten(@color, 20%);
+}
+#enterQuery::-ms-expand {
+  color: lighten(@color, 20%);
+}
+#searchButton {
+    .setContainer(10%, 30px, 4.5px 0px 0px 0%, transparent, 1px solid @color, lighten(@color, 30%));
+    border-radius: 15px;
+    outline: none;
+}
+footer {
+    .setContainer(190px, 30px,20px 0 10px -95px, transparent, none, inherit);
+    position: absolute;
+    bottom: 0;
+    left: 50%;    
+}
+.prev,
+.curr,
+.next {
+    .setContainer(50px, 20px, 4.5px 5px 0px 5px, transparent, 1px solid @color, lighten(@color, 30%));
+    border-radius: 10px;
+    outline: none;
+}
+
+
+
+
+
+
+
+
+.resultContainer_results,
+.resultContainer{
+    .setContainer(100%, auto, 0 auto, transparent, none, inherit);
+    max-width: 1200px;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-around;
+    padding: 0;
+}
+.resultContainer_resultItem {
+    .setContainer(18%, 350px, 5px 1%, transparent, none, inherit);
+    position: relative;
+    list-style: none;
+}
+.resultItem_img {
+    .setContainer(98%, auto, 1%, transparent, 1px solid @color, inherit);
+    border-radius: 10px;
+    /*margin-bottom: 80px;*/
+}
+.resultItem_descriptionBox {
+    .setContainer(100%, auto, 5px 0, transparent, none, inherit);
+}
+.title_box {
+    .setContainer(100%, auto, 0, @color, none, white);
+    min-height: 70px;
+    opacity: 0.8;
+}
+.descriptionBox_title {
+    text-align: center; 
+    vertical-align: middle;
+}
+.descriptionBox_name {
+    .setContainer(70%, 20px, 5px 0px 0 auto, @color, none, white);
+    opacity: 0.8;
+    text-align: center;
+    line-height: 20px;
+}
+.descriptionBox_description {
+    .setContainer(98%, auto, 10px 0, transparent, none, @color);
+    border: 1px solid @color;
+    border-radius: 10px;
+    padding-left: 2%;
+    font-weight: 700;
+    min-height: 110px;
+    word-break: break-word;
+}
+.descriptionBox_date {
+    .setContainer(40%, auto, 0 4% , transparent, none, @color);
+    display: inline-block;
+}
+.resultItem_descriptionBox a {
+    .setContainer(40%, 40px, 0  4%, transparent, none, @color);
+    text-align: right;
+    text-decoration: none;
+    display: inline-block;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

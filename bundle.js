@@ -63,7 +63,7 @@
 /******/ 	__webpack_require__.p = "";
 /******/
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = 3);
+/******/ 	return __webpack_require__(__webpack_require__.s = 4);
 /******/ })
 /************************************************************************/
 /******/ ([
@@ -17156,10 +17156,244 @@
   }
 }.call(this));
 
-/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(1), __webpack_require__(2)(module)))
+/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(2), __webpack_require__(3)(module)))
 
 /***/ }),
 /* 1 */
+/***/ (function(module, exports, __webpack_require__) {
+
+let {Render} = __webpack_require__(5);
+
+class Youtube extends Render{
+    constructor(key) {
+        super();
+        this.key = key;
+        this.query = '';
+        this.items = [];
+        this.prev = {
+            prev: null,
+            this: null,
+            page: 0,
+            items: []
+        };
+        this.curr = {
+            this: null,
+            page: 1,
+            items: []
+        };
+        this.next = {
+            this: null,
+            next: null,
+            page: 0,
+            items: []
+        };
+        this.page = 0;
+    }
+    init() {
+        gapi.auth.authorize({
+            client_id: '1023823723398-qa1vdrede2jf9mr6657hshaibfb6mn94.apps.googleusercontent.com',
+            scope: 'https://www.googleapis.com/auth/youtube.readonly',
+            immediate: false
+        }, function() {});
+        gapi.client.setApiKey(this.key);
+        gapi.client.load("youtube", "v3", function(){});
+    }
+    setListeners() {
+        let self = this;
+        document.getElementById('next').addEventListener('click', function() {self.search(0, self.next.next, self)});
+        document.getElementById('prev').addEventListener('click', function() {self.search(self.prev.prev, 0, self)});
+        document.getElementById('searchButton').addEventListener('click', function() {self.search(0,0, self)});
+        window.addEventListener('resize', function(){self.render(self.items, self.page);});
+    }
+    search(prev, next, self) {
+        let results;
+        let request;
+        self.query = document.getElementById('enterQuery').value;
+        
+        if(prev == 0 & next == 0) {
+            self.prev.prev = null;
+            self.prev.this = null;
+            self.prev.page = 0,
+            self.prev.items = [];
+            gapi.client.youtube.search.list({
+                    part: "snippet",
+                    type: "video",
+                    q: self.query,
+                    order: "viewCount"
+            }).then(function(request) {
+                results = request.result;
+                self.curr.items = self.setItems(results);
+                self.items = [...self.items, ...self.curr.items];
+                if(document.documentElement.clientWidth < 768) { 
+                    self.render(self.items, self.page);
+                } else if(document.documentElement.clientWidth >= 768 && document.documentElement.clientWidth < 1024){
+                    self.render(self.items, Math.floor(self.page));
+                } else if(document.documentElement.clientWidth >= 1024){
+                    self.render(self.items, Math.floor(self.page));
+                }
+                if(results.nextPageToken != undefined) {
+                    self.next.this = results.nextPageToken;
+                    self.next.page = 2;
+                    return gapi.client.youtube.search.list({
+                        part: "snippet",
+                        type: "video",
+                        q: self.query,
+                        order: "viewCount",
+                        pageToken: self.next.this
+                    });
+                }
+            }).then(function(request){
+                results = request.result;
+                self.next.items = self.setItems(results);
+                self.items = [...self.items, ...self.next.items];
+                self.curr.this = results.prevPageToken;
+                self.next.next = results.nextPageToken;
+            });
+        }
+        if(prev != 0 ) {
+            if(self.page == 0) {
+                return;
+            }
+            
+            if(document.documentElement.clientWidth < 768) { 
+                self.page -= 1;
+                self.render(self.items, self.page);
+            } else if(document.documentElement.clientWidth >= 768 && document.documentElement.clientWidth < 1024){
+                self.page -= 3;
+                self.render(self.items, Math.floor(self.page));
+            } else if(document.documentElement.clientWidth >= 1024){
+                self.page -= 5;
+                self.render(self.items, Math.floor(self.page));
+            }
+            /*self.next.items = self.curr.items;
+            self.next.next = self.next.this;
+            self.next.this = self.curr.this;
+            self.curr.page -= 1;             
+            self.curr.items = self.prev.items;
+            render(self.curr.items);
+            self.curr.this = self.prev.this;
+            gapi.client.youtube.search.list({
+                    part: "snippet",
+                    type: "video",
+                    q: self.query,
+                    order: "viewCount",
+                    pageToken: prev
+            }).then(function(request) {
+                results = request.result;
+                self.prev.items = self.setItems(results);
+                self.prev.this = self.prev.prev;
+                if(results.prevPageToken != undefined) {
+                    self.prev.prev = results.prevPageToken;
+                } else {
+                    self.prev.prev = null;
+                }
+                self.prev.page = self.curr.page-1;
+            });*/
+        }
+        if(next != 0 ) {
+            if(self.next.next == null) {
+                return;
+            }
+            
+            if(self.items[self.page+self.page*5+1] == undefined && self.next.next != null) {
+                gapi.client.youtube.search.list({
+                    part: "snippet",
+                    type: "video",
+                    q: self.query,
+                    order: "viewCount",
+                    pageToken: next
+                }).then(function(request) {
+                    results = request.result;
+                    self.next.items = self.setItems(results);
+                    self.items = [...self.items, ...self.next.items];
+                    if(results.nextPageToken != undefined) {
+                        self.next.next = results.nextPageToken;
+                    } else {
+                        self.next.next = null;
+                    }
+                });
+            }
+            if(document.documentElement.clientWidth < 768) { 
+                self.page += 1;
+                self.render(self.items, self.page);
+            } else if (document.documentElement.clientWidth >= 768 && document.documentElement.clientWidth < 1024){
+                self.page += 3;
+                self.render(self.items, Math.floor(self.page));
+            } else if (document.documentElement.clientWidth >= 1024){
+                self.page += 5;
+                self.render(self.items, Math.floor(self.page));
+            }
+            /*self.prev.items = self.curr.items;
+            self.prev.prev= self.prev.this;
+            self.prev.this = self.curr.this;
+            self.curr.page += 1;             
+            self.curr.items = self.next.items;
+            render(self.curr.items);
+            self.curr.this = self.next.this;
+            gapi.client.youtube.search.list({
+                    part: "snippet",
+                    type: "video",
+                    q: self.query,
+                    order: "viewCount",
+                    pageToken: next
+            }).then(function(request) {
+                results = request.result;
+                self.next.this = self.next.next;
+                self.next.items = self.setItems(results);
+                if(results.nextPageToken != undefined) {
+                    self.next.next = results.nextPageToken;
+                } else {
+                    self.next.next = null;
+                }
+                self.next.page = self.curr.page+1;
+            });*/
+        }
+        
+        
+        
+        
+        
+    }
+    setItems(results) {
+        let items = results.items.map((item)=> {
+            return {
+                img: item.snippet.thumbnails.high.url,
+                title: item.snippet.title,
+                name: item.snippet.channelTitle,
+                description: item.snippet.description,
+                date: item.snippet.publishedAt.slice(0,10),
+                url: 'https://www.youtube.com/watch?v='+item.id.videoId
+            }
+        });
+        return items;
+    }
+}
+
+/*class GreatPerson extends Person {
+  constructor(name, phrase) {
+    super(name);
+    this.phrase = phrase;
+  }
+  sayPhrase() {
+    console.log(`${this.name} says: "${this.phrase}"`)
+  }
+}*/
+
+
+
+
+module.exports = {
+    Youtube
+}
+
+
+
+
+
+
+
+/***/ }),
+/* 2 */
 /***/ (function(module, exports) {
 
 var g;
@@ -17186,7 +17420,7 @@ module.exports = g;
 
 
 /***/ }),
-/* 2 */
+/* 3 */
 /***/ (function(module, exports) {
 
 module.exports = function(module) {
@@ -17214,73 +17448,97 @@ module.exports = function(module) {
 
 
 /***/ }),
-/* 3 */
+/* 4 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var _ = __webpack_require__(0);
+let {Youtube} = __webpack_require__(1);
 
-function init() {
-    gapi.client.setApiKey('AIzaSyB9Y-NxEUbkWCJq1Bu7LM2nCGhmHDEyzFE');
-    gapi.client.load("youtube", "v3", function(){});
-}
+
+let youtube = new Youtube('AIzaSyAtQRlS7nPy56Fr6bFLwUz6Zp5GtHG7-rk');
 window.onload = function() {
-    init();
+    youtube.init();
 };
-let next = '';
-let prev = '';
-let pages = [];
-let imgs = '';
-let query;
-document.getElementById('next').addEventListener('click', function() {search(next)});
-document.getElementById('prev').addEventListener('click', function() {search(prev)});
-document.getElementById('search-button').addEventListener('click', function() {search()});
+youtube.setListeners();
 
-// Search for a specified string.
-function search(pageToken) {
-    let request;
-    let results;
-    query = document.getElementById('enterQuery').value;
-    if(pageToken != undefined) {
-        request = gapi.client.youtube.search.list({
-            part: "snippet",
-            type: "video",
-            q: query,
-            order: "rating",
-            pageToken: pageToken
-       });
-    } else {
-        request = gapi.client.youtube.search.list({
-            part: "snippet",
-            type: "video",
-            q: query,
-            order: "rating"
-       });
-    }
-    
-    request.execute(function(response) {
-        results = response.result;
-        console.log(results);
-        if(results.prevPageToken != undefined) {
-            prev = results.prevPageToken;
-        } else {
-            prev = '';
-        }
-        next = results.nextPageToken;
-        imgs = results.items.map(function(item){
-            return item.snippet.thumbnails.default.url;
-        });
-        let tmpl = _.template('<%obj.forEach(function(item){%>\
-                        <li class="default"><img src="<%-item%>" alt="" width="100px" height="100px">\
-                        </li><%});%>');
-        let html = tmpl(imgs);
-        document.getElementById('results').innerHTML = html;
-    });
-}
+
+
 module.exports = {
-    imgs
 }
 
 
+
+/***/ }),
+/* 5 */
+/***/ (function(module, exports, __webpack_require__) {
+
+let _ = __webpack_require__(0);
+
+
+
+class Render{
+     constructor() {
+         this.current = null;
+         this.tmpl =  _.template('<%obj.forEach(function(item){%>\
+            <li class="resultContainer_resultItem">\
+                <a href="<%-item.url%>"><img class="resultItem_img" src="<%-item.img%>" alt=""></a>\
+                <div class="resultItem_descriptionBox">\
+                    <div class="title_box">\
+                        <h4 class="descriptionBox_title"><%-item.title%></h4>\
+                    </div>\
+                    <h6 class="descriptionBox_name"><%-item.name%></h6>\
+                    <h5 class="descriptionBox_description"><%-item.description%></h5>\
+                    <h4 class="descriptionBox_date"><%-item.date%></h4>\
+                    <a href="<%-item.url%>">more &rarr;</a>\
+                </div>\
+            </li><%});%>');
+     }
+       render(arr,page) {
+        if(document.documentElement.clientWidth < 768) {
+            if(this.current != null && this.current[0] < 768 && this.current[1] == page) {
+                return;
+            }
+            let renderArr = arr.slice(page,page+1);
+            let html = this.tmpl(renderArr);
+            document.getElementById('results').innerHTML = html;
+            [].forEach.call(document.getElementsByClassName('resultContainer_resultItem'),(item)=> {
+                item.style.width = '90%';
+            });
+            this.current = [document.documentElement.clientWidth, page];
+        }
+        if(document.documentElement.clientWidth >= 768 && document.documentElement.clientWidth < 1024) {
+            if(this.current != null && this.current[0] >= 768 && this.current[0] < 1024 && this.current[1] == page) {
+                return;
+            }
+            let renderArr = arr.slice(page,page+3);
+            let html = this.tmpl(renderArr);
+            document.getElementById('results').innerHTML = html;
+            [].forEach.call(document.getElementsByClassName('resultContainer_resultItem'),(item)=> {
+                item.style.width = '30%';
+            });
+            this.current = [document.documentElement.clientWidth, page];
+        }
+        if(document.documentElement.clientWidth >= 1024) {
+            if(this.current != null && this.current[0] >= 1024 && this.current[1] == page) {
+                return;
+            }
+            let renderArr = arr.slice(page, page+5);
+            let html = this.tmpl(renderArr);
+            document.getElementById('results').innerHTML = html;
+            [].forEach.call(document.getElementsByClassName('resultContainer_resultItem'),(item)=> {
+                item.style.width = '18%';
+            });
+            this.current = [document.documentElement.clientWidth, page];
+        }
+       }
+
+}
+
+
+
+module.exports = {
+    Render
+}
 
 /***/ })
 /******/ ]);
