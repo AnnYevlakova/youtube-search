@@ -9,57 +9,62 @@
 }
 
 body {
-    .setContainer(100%, 100%, 0, @color, none, @color);
-    position: absolute;
-    top: 0;
-    left: 0;
-    z-index: -20;
+    .setContainer(100%, 100vh, 0, black, none, @color);
+    min-height: 100%;
     background-image: url(../images/sky.jpg);
     background-position: left top;
     background-size: cover;
     font-size: 14px;
-    padding-bottom: 40px;
 }
-header {
-    max-width: 1200px;
-    margin: 0px auto;
-}
-h1 {
-    text-align: center;
+.container {
+    .setContainer(100%, 100%, 0, transparent, none, @color);
+    user-select: none;
+    display: flex;
+    flex-direction: column; 
+    justify-content: flex-start;
 }
 .searchField {
-    .setContainer(80%, 40px, 10px auto, transparent, 1px solid darken(@color, 10%), inherit);
+    .setContainer(80%, 40px, 30px auto 10px auto, transparent, 1px solid darken(@color, 10%), inherit);
+    display: flex;
+    align-items: center;
     max-width: 1200px;
-    border-radius: 20px;
+    border-radius: 20px; 
 }
 #enterQuery {
-    .setContainer(70%, 30px, 4.5px auto 5px 5%, transparent, 1px solid @color, lighten(@color, 20%));
+    .setContainer(70%, 30px, 0 auto 0 5%, transparent, 1px solid @color, lighten(@color, 20%));
     border-radius: 15px;
     padding: 0 0 0 10px;
     outline: none; 
+    font-size: 14px;
+    line-height: 20px;
 }
 #enterQuery::-moz-placeholder {
-  color: lighten(@color, 20%);
+    color: lighten(@color, 20%);
 }
 #enterQuery:-ms-input-placeholder {
-  color: lighten(@color, 20%);
+    color: lighten(@color, 20%);
 }
 #enterQuery::-webkit-input-placeholder {
-  color: lighten(@color, 20%);
+    color: lighten(@color, 20%);
 }
 #enterQuery::-ms-expand {
-  color: lighten(@color, 20%);
+    color: lighten(@color, 20%);
 }
 #searchButton {
-    .setContainer(10%, 30px, 4.5px 0px 0px 0%, transparent, 1px solid @color, lighten(@color, 30%));
+    .setContainer(10%, 30px, 0 5% 0 5%, transparent, 1px solid @color, lighten(@color, 30%));
     border-radius: 15px;
     outline: none;
+    line-height: 20px;
 }
 footer {
-    .setContainer(190px, 30px,20px 0 10px -95px, transparent, none, inherit);
+    .setContainer(100%, 30px, auto 0 0 0, transparent, none, inherit);    position: relative;
+}
+.pagination {
+    .setContainer(190px, 30px, auto 0 0px -95px, transparent, none, inherit);
+    display: none;
     position: absolute;
     bottom: 0;
-    left: 50%;    
+    left: 50%;
 }
 .prev,
 .curr,
@@ -69,38 +74,30 @@ footer {
     outline: none;
 }
 
-
-
-
-
-
-
-
 .resultContainer_results,
 .resultContainer{
-    .setContainer(100%, auto, 0 auto, transparent, none, inherit);
+    .setContainer(100%, auto, auto, transparent, none, inherit);
     max-width: 1200px;
     display: flex;
     flex-wrap: wrap;
     justify-content: space-around;
     padding: 0;
 }
+
 .resultContainer_resultItem {
-    .setContainer(18%, 350px, 5px 1%, transparent, none, inherit);
+    .setContainer(18%, auto, 5px 1%, transparent, none, inherit);
     position: relative;
     list-style: none;
 }
 .resultItem_img {
     .setContainer(98%, auto, 1%, transparent, 1px solid @color, inherit);
     border-radius: 10px;
-    /*margin-bottom: 80px;*/
 }
 .resultItem_descriptionBox {
     .setContainer(100%, auto, 5px 0, transparent, none, inherit);
 }
 .title_box {
-    .setContainer(100%, auto, 0, @color, none, white);
-    min-height: 70px;
+    .setContainer(100%, 70px, 0, @color, none, white);
     opacity: 0.8;
 }
 .descriptionBox_title {
@@ -114,8 +111,7 @@ footer {
     line-height: 20px;
 }
 .descriptionBox_description {
-    .setContainer(98%, auto, 10px 0, transparent, none, @color);
-    border: 1px solid @color;
+    .setContainer(98%, auto, 10px 0, transparent, 1px solid @color, @color);
     border-radius: 10px;
     padding-left: 2%;
     font-weight: 700;
@@ -127,7 +123,7 @@ footer {
     display: inline-block;
 }
 .resultItem_descriptionBox a {
-    .setContainer(40%, 40px, 0  4%, transparent, none, @color);
+    .setContainer(40%, auto, 0  4%, transparent, none, @color);
     text-align: right;
     text-decoration: none;
     display: inline-block;
@@ -135,35 +131,19 @@ footer {
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+@media (max-width: 768px) {
+    .searchField {
+        width: 95%;
+        margin-top: 5px;
+    }
+    .title_box {
+        height: 50px;
+    }
+    
+    .descriptionBox_description {
+        min-height: 50px;
+    }
+}
 
 
 

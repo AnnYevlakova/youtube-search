@@ -8,19 +8,13 @@ class Youtube extends Render{
         this.items = [];
         this.prev = {
             prev: null,
-            this: null,
-            page: 0,
             items: []
         };
         this.curr = {
-            this: null,
-            page: 1,
             items: []
         };
         this.next = {
-            this: null,
             next: null,
-            page: 0,
             items: []
         };
         this.page = 0;
@@ -40,6 +34,22 @@ class Youtube extends Render{
         document.getElementById('prev').addEventListener('click', function() {self.search(self.prev.prev, 0, self)});
         document.getElementById('searchButton').addEventListener('click', function() {self.search(0,0, self)});
         window.addEventListener('resize', function(){self.render(self.items, self.page);});
+        window.addEventListener('touchstart', function(e){self.swipeStart(e);});
+        window.addEventListener('mousedown', function(e){self.swipeStart(e);});
+        window.addEventListener('touchend', function(e){self.swipeEnd(e);});
+        window.addEventListener('mouseup', function(e){self.swipeEnd(e);});
+        window.addEventListener('keydown', function(e){
+            if(e.keyCode == 13) {
+                document.getElementById('searchButton').click();
+            }
+        });
+        document.getElementById('enterQuery').addEventListener('focus',function(){
+            this.setAttribute('placeholder',". . .");
+            this.value = '';
+        });
+       document.getElementById('enterQuery').addEventListener('blur',function(){
+            this.setAttribute('placeholder',"Are you looking for some video?");
+        });
     }
     search(prev, next, self) {
         let results;
@@ -48,9 +58,9 @@ class Youtube extends Render{
         
         if(prev == 0 & next == 0) {
             self.prev.prev = null;
-            self.prev.this = null;
-            self.prev.page = 0,
             self.prev.items = [];
+            self.items = [];
+            self.page = 0;
             gapi.client.youtube.search.list({
                     part: "snippet",
                     type: "video",
@@ -68,69 +78,48 @@ class Youtube extends Render{
                     self.render(self.items, Math.floor(self.page));
                 }
                 if(results.nextPageToken != undefined) {
-                    self.next.this = results.nextPageToken;
-                    self.next.page = 2;
+                    self.next.next = results.nextPageToken;
                     return gapi.client.youtube.search.list({
                         part: "snippet",
                         type: "video",
                         q: self.query,
                         order: "viewCount",
-                        pageToken: self.next.this
+                        pageToken: self.next.next
                     });
                 }
             }).then(function(request){
                 results = request.result;
                 self.next.items = self.setItems(results);
                 self.items = [...self.items, ...self.next.items];
-                self.curr.this = results.prevPageToken;
                 self.next.next = results.nextPageToken;
             });
         }
         if(prev != 0 ) {
-            if(self.page == 0) {
+            if(self.page <= 0) {
+                self.page = 0;
                 return;
             }
-            
             if(document.documentElement.clientWidth < 768) { 
                 self.page -= 1;
                 self.render(self.items, self.page);
             } else if(document.documentElement.clientWidth >= 768 && document.documentElement.clientWidth < 1024){
                 self.page -= 3;
+                if(self.page <= 0) {
+                    self.page = 0;
+                }
                 self.render(self.items, Math.floor(self.page));
             } else if(document.documentElement.clientWidth >= 1024){
                 self.page -= 5;
+                if(self.page <= 0) {
+                    self.page = 0;
+                }
                 self.render(self.items, Math.floor(self.page));
             }
-            /*self.next.items = self.curr.items;
-            self.next.next = self.next.this;
-            self.next.this = self.curr.this;
-            self.curr.page -= 1;             
-            self.curr.items = self.prev.items;
-            render(self.curr.items);
-            self.curr.this = self.prev.this;
-            gapi.client.youtube.search.list({
-                    part: "snippet",
-                    type: "video",
-                    q: self.query,
-                    order: "viewCount",
-                    pageToken: prev
-            }).then(function(request) {
-                results = request.result;
-                self.prev.items = self.setItems(results);
-                self.prev.this = self.prev.prev;
-                if(results.prevPageToken != undefined) {
-                    self.prev.prev = results.prevPageToken;
-                } else {
-                    self.prev.prev = null;
-                }
-                self.prev.page = self.curr.page-1;
-            });*/
         }
         if(next != 0 ) {
             if(self.next.next == null) {
                 return;
             }
-            
             if(self.items[self.page+self.page*5+1] == undefined && self.next.next != null) {
                 gapi.client.youtube.search.list({
                     part: "snippet",
@@ -147,48 +136,30 @@ class Youtube extends Render{
                     } else {
                         self.next.next = null;
                     }
+                    if(document.documentElement.clientWidth < 768) { 
+                        self.page += 1;
+                        self.render(self.items, self.page);
+                    } else if (document.documentElement.clientWidth >= 768 && document.documentElement.clientWidth < 1024){
+                        self.page += 3;
+                        self.render(self.items, Math.floor(self.page));
+                    } else if (document.documentElement.clientWidth >= 1024){
+                        self.page += 5;
+                        self.render(self.items, Math.floor(self.page));
+                    }
                 });
-            }
-            if(document.documentElement.clientWidth < 768) { 
-                self.page += 1;
-                self.render(self.items, self.page);
-            } else if (document.documentElement.clientWidth >= 768 && document.documentElement.clientWidth < 1024){
-                self.page += 3;
-                self.render(self.items, Math.floor(self.page));
-            } else if (document.documentElement.clientWidth >= 1024){
-                self.page += 5;
-                self.render(self.items, Math.floor(self.page));
-            }
-            /*self.prev.items = self.curr.items;
-            self.prev.prev= self.prev.this;
-            self.prev.this = self.curr.this;
-            self.curr.page += 1;             
-            self.curr.items = self.next.items;
-            render(self.curr.items);
-            self.curr.this = self.next.this;
-            gapi.client.youtube.search.list({
-                    part: "snippet",
-                    type: "video",
-                    q: self.query,
-                    order: "viewCount",
-                    pageToken: next
-            }).then(function(request) {
-                results = request.result;
-                self.next.this = self.next.next;
-                self.next.items = self.setItems(results);
-                if(results.nextPageToken != undefined) {
-                    self.next.next = results.nextPageToken;
-                } else {
-                    self.next.next = null;
+            } else {
+                if(document.documentElement.clientWidth < 768) { 
+                    self.page += 1;
+                    self.render(self.items, self.page);
+                } else if (document.documentElement.clientWidth >= 768 && document.documentElement.clientWidth < 1024){
+                    self.page += 3;
+                    self.render(self.items, Math.floor(self.page));
+                } else if (document.documentElement.clientWidth >= 1024){
+                    self.page += 5;
+                    self.render(self.items, Math.floor(self.page));
                 }
-                self.next.page = self.curr.page+1;
-            });*/
+             }
         }
-        
-        
-        
-        
-        
     }
     setItems(results) {
         let items = results.items.map((item)=> {
@@ -204,19 +175,6 @@ class Youtube extends Render{
         return items;
     }
 }
-
-/*class GreatPerson extends Person {
-  constructor(name, phrase) {
-    super(name);
-    this.phrase = phrase;
-  }
-  sayPhrase() {
-    console.log(`${this.name} says: "${this.phrase}"`)
-  }
-}*/
-
-
-
 
 module.exports = {
     Youtube
