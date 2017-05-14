@@ -1,4 +1,3 @@
-var _ = require("lodash");
 let {Youtube} = require('./youtube-control');
 
 
@@ -8,5 +7,3 @@ window.onload = function() {
 };
 youtube.preload();
 youtube.setListeners();
-
-

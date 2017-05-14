@@ -1,6 +1,6 @@
 body {
   width: 100%;
-  height: 100vh;
+  height: 100%;
   margin: 0;
   background-color: black;
   color: #062084;
@@ -18,6 +18,7 @@ body {
   background-color: transparent;
   color: #062084;
   border: none;
+  min-height: 100%;
   user-select: none;
   display: flex;
   flex-direction: column;
@@ -103,6 +104,20 @@ footer {
   border: 1px solid #062084;
   border-radius: 10px;
   outline: none;
+}
+.tooltip {
+  width: 20px;
+  height: 20px;
+  margin: 0;
+  background-color: transparent;
+  color: #062084;
+  border: none;
+  position: absolute;
+  top: -25px;
+  z-index: 100;
+  border-radius: 5px;
+  display: none;
+  left: 0;
 }
 .resultContainer_results,
 .resultContainer {

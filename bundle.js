@@ -70,6 +70,190 @@
 /* 0 */
 /***/ (function(module, exports, __webpack_require__) {
 
+let {Render} = __webpack_require__(5);
+
+class Youtube extends Render{
+    constructor(key) {
+        super();
+        this.key = key;
+        this.query = '';
+        this.items = [];
+        this.prev = {
+            prev: null,
+            items: []
+        };
+        this.curr = {
+            items: []
+        };
+        this.next = {
+            next: null,
+            items: []
+        };
+        this.page = 0;
+    }
+    init() {
+        /*gapi.auth.authorize({
+            client_id: '1023823723398-qa1vdrede2jf9mr6657hshaibfb6mn94.apps.googleusercontent.com',
+            scope: 'https://www.googleapis.com/auth/youtube.readonly',
+            immediate: false
+        }, function() {});*/
+        gapi.client.setApiKey(this.key);
+        gapi.client.load('youtube', 'v3', function(){});
+    }
+    setListeners() {
+        let self = this; document.getElementById('next').addEventListener('click', function() {self.search(0, self.next.next, self);}); 
+        document.getElementById('prev').addEventListener('click', function() {self.search(self.prev.prev, 0, self);}); 
+        document.getElementById('searchButton').addEventListener('click', function() {self.search(0,0, self);});
+        window.addEventListener('resize', function(){self.render(self.items, self.page);});
+        window.addEventListener('touchstart', function(e){self.swipeStart(e);});
+        window.addEventListener('mousedown', function(e){self.swipeStart(e);});
+        window.addEventListener('touchend', function(e){self.swipeEnd(e);});
+        window.addEventListener('mouseup', function(e){self.swipeEnd(e);});
+        window.addEventListener('keydown', function(e){
+            if(e.keyCode == 13) {
+                document.getElementById('searchButton').click();
+            }
+        });
+        document.getElementById('enterQuery').addEventListener('focus',function(){
+            this.setAttribute('placeholder','. . .');
+            this.value = '';
+        });
+        document.getElementById('enterQuery').addEventListener('blur',function(){
+            this.setAttribute('placeholder','Are you looking for some video?');
+        });
+    }
+    search(prev, next, self) {
+        let results;
+        self.query = document.getElementById('enterQuery').value;
+        
+        if(prev == 0 & next == 0) {
+            self.prev.prev = null;
+            self.prev.items = [];
+            self.items = [];
+            self.page = 0;
+            gapi.client.youtube.search.list({
+                part: 'snippet',
+                type: 'video',
+                q: self.query,
+                order: 'viewCount'
+            }).then(function(request) {
+                results = request.result;
+                self.curr.items = self.setItems(results);
+                self.items = [...self.items, ...self.curr.items];
+                if(document.documentElement.clientWidth < 768) { 
+                    self.render(self.items, self.page);
+                } else if(document.documentElement.clientWidth >= 768 && document.documentElement.clientWidth < 1024){
+                    self.render(self.items, Math.floor(self.page));
+                } else if(document.documentElement.clientWidth >= 1024){
+                    self.render(self.items, Math.floor(self.page));
+                }
+                if(results.nextPageToken != undefined) {
+                    self.next.next = results.nextPageToken;
+                    return gapi.client.youtube.search.list({
+                        part: 'snippet',
+                        type: 'video',
+                        q: self.query,
+                        order: 'viewCount',
+                        pageToken: self.next.next
+                    });
+                }
+            }).then(function(request){
+                results = request.result;
+                self.next.items = self.setItems(results);
+                self.items = [...self.items, ...self.next.items];
+                self.next.next = results.nextPageToken;
+            });
+        }
+        if(prev != 0 ) {
+            if(self.page <= 0) {
+                self.page = 0;
+                return;
+            }
+            if(document.documentElement.clientWidth < 768) { 
+                self.page -= 1;
+                self.render(self.items, self.page);
+            } else if(document.documentElement.clientWidth >= 768 && document.documentElement.clientWidth < 1024){
+                self.page -= 3;
+                if(self.page <= 0) {
+                    self.page = 0;
+                }
+                self.render(self.items, Math.floor(self.page));
+            } else if(document.documentElement.clientWidth >= 1024){
+                self.page -= 5;
+                if(self.page <= 0) {
+                    self.page = 0;
+                }
+                self.render(self.items, Math.floor(self.page));
+            }
+        }
+        if(next != 0 ) {
+            if(self.next.next == null) {
+                return;
+            }
+            if(self.items[self.page+self.page*5+1] == undefined && self.next.next != null) {
+                gapi.client.youtube.search.list({
+                    part: 'snippet',
+                    type: 'video',
+                    q: self.query,
+                    order: 'viewCount',
+                    pageToken: next
+                }).then(function(request) {
+                    results = request.result;
+                    self.next.items = self.setItems(results);
+                    self.items = [...self.items, ...self.next.items];
+                    if(results.nextPageToken != undefined) {
+                        self.next.next = results.nextPageToken;
+                    } else {
+                        self.next.next = null;
+                    }
+                    if(document.documentElement.clientWidth < 768) { 
+                        self.page += 1;
+                        self.render(self.items, self.page);
+                    } else if (document.documentElement.clientWidth >= 768 && document.documentElement.clientWidth < 1024){
+                        self.page += 3;
+                        self.render(self.items, Math.floor(self.page));
+                    } else if (document.documentElement.clientWidth >= 1024){
+                        self.page += 5;
+                        self.render(self.items, Math.floor(self.page));
+                    }
+                });
+            } else {
+                if(document.documentElement.clientWidth < 768) { 
+                    self.page += 1;
+                    self.render(self.items, self.page);
+                } else if (document.documentElement.clientWidth >= 768 && document.documentElement.clientWidth < 1024){
+                    self.page += 3;
+                    self.render(self.items, Math.floor(self.page));
+                } else if (document.documentElement.clientWidth >= 1024){
+                    self.page += 5;
+                    self.render(self.items, Math.floor(self.page));
+                }
+            }
+        }
+    }
+    setItems(results) {
+        let items = results.items.map((item)=> {
+            return {
+                img: item.snippet.thumbnails.high.url,
+                title: item.snippet.title,
+                name: item.snippet.channelTitle,
+                description: item.snippet.description,
+                date: item.snippet.publishedAt.slice(0,10),
+                url: 'https://www.youtube.com/watch?v='+item.id.videoId
+            };
+        });
+        return items;
+    }
+}
+
+module.exports = {
+    Youtube
+};
+
+/***/ }),
+/* 1 */
+/***/ (function(module, exports, __webpack_require__) {
+
 /* WEBPACK VAR INJECTION */(function(global, module) {var __WEBPACK_AMD_DEFINE_RESULT__;/**
  * @license
  * Lodash <https://lodash.com/>
@@ -17159,198 +17343,6 @@
 /* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(2), __webpack_require__(3)(module)))
 
 /***/ }),
-/* 1 */
-/***/ (function(module, exports, __webpack_require__) {
-
-let {Render} = __webpack_require__(5);
-
-class Youtube extends Render{
-    constructor(key) {
-        super();
-        this.key = key;
-        this.query = '';
-        this.items = [];
-        this.prev = {
-            prev: null,
-            items: []
-        };
-        this.curr = {
-            items: []
-        };
-        this.next = {
-            next: null,
-            items: []
-        };
-        this.page = 0;
-    }
-    init() {
-        gapi.auth.authorize({
-            client_id: '1023823723398-qa1vdrede2jf9mr6657hshaibfb6mn94.apps.googleusercontent.com',
-            scope: 'https://www.googleapis.com/auth/youtube.readonly',
-            immediate: false
-        }, function() {});
-        gapi.client.setApiKey(this.key);
-        gapi.client.load("youtube", "v3", function(){});
-    }
-    setListeners() {
-        let self = this;
-        document.getElementById('next').addEventListener('click', function() {self.search(0, self.next.next, self)});
-        document.getElementById('prev').addEventListener('click', function() {self.search(self.prev.prev, 0, self)});
-        document.getElementById('searchButton').addEventListener('click', function() {self.search(0,0, self)});
-        window.addEventListener('resize', function(){self.render(self.items, self.page);});
-        window.addEventListener('touchstart', function(e){self.swipeStart(e);});
-        window.addEventListener('mousedown', function(e){self.swipeStart(e);});
-        window.addEventListener('touchend', function(e){self.swipeEnd(e);});
-        window.addEventListener('mouseup', function(e){self.swipeEnd(e);});
-        window.addEventListener('keydown', function(e){
-            if(e.keyCode == 13) {
-                document.getElementById('searchButton').click();
-            }
-        });
-        document.getElementById('enterQuery').addEventListener('focus',function(){
-            this.setAttribute('placeholder',". . .");
-            this.value = '';
-        });
-       document.getElementById('enterQuery').addEventListener('blur',function(){
-            this.setAttribute('placeholder',"Are you looking for some video?");
-        });
-    }
-    search(prev, next, self) {
-        let results;
-        let request;
-        self.query = document.getElementById('enterQuery').value;
-        
-        if(prev == 0 & next == 0) {
-            self.prev.prev = null;
-            self.prev.items = [];
-            self.items = [];
-            self.page = 0;
-            gapi.client.youtube.search.list({
-                    part: "snippet",
-                    type: "video",
-                    q: self.query,
-                    order: "viewCount"
-            }).then(function(request) {
-                results = request.result;
-                self.curr.items = self.setItems(results);
-                self.items = [...self.items, ...self.curr.items];
-                if(document.documentElement.clientWidth < 768) { 
-                    self.render(self.items, self.page);
-                } else if(document.documentElement.clientWidth >= 768 && document.documentElement.clientWidth < 1024){
-                    self.render(self.items, Math.floor(self.page));
-                } else if(document.documentElement.clientWidth >= 1024){
-                    self.render(self.items, Math.floor(self.page));
-                }
-                if(results.nextPageToken != undefined) {
-                    self.next.next = results.nextPageToken;
-                    return gapi.client.youtube.search.list({
-                        part: "snippet",
-                        type: "video",
-                        q: self.query,
-                        order: "viewCount",
-                        pageToken: self.next.next
-                    });
-                }
-            }).then(function(request){
-                results = request.result;
-                self.next.items = self.setItems(results);
-                self.items = [...self.items, ...self.next.items];
-                self.next.next = results.nextPageToken;
-            });
-        }
-        if(prev != 0 ) {
-            if(self.page <= 0) {
-                self.page = 0;
-                return;
-            }
-            if(document.documentElement.clientWidth < 768) { 
-                self.page -= 1;
-                self.render(self.items, self.page);
-            } else if(document.documentElement.clientWidth >= 768 && document.documentElement.clientWidth < 1024){
-                self.page -= 3;
-                if(self.page <= 0) {
-                    self.page = 0;
-                }
-                self.render(self.items, Math.floor(self.page));
-            } else if(document.documentElement.clientWidth >= 1024){
-                self.page -= 5;
-                if(self.page <= 0) {
-                    self.page = 0;
-                }
-                self.render(self.items, Math.floor(self.page));
-            }
-        }
-        if(next != 0 ) {
-            if(self.next.next == null) {
-                return;
-            }
-            if(self.items[self.page+self.page*5+1] == undefined && self.next.next != null) {
-                gapi.client.youtube.search.list({
-                    part: "snippet",
-                    type: "video",
-                    q: self.query,
-                    order: "viewCount",
-                    pageToken: next
-                }).then(function(request) {
-                    results = request.result;
-                    self.next.items = self.setItems(results);
-                    self.items = [...self.items, ...self.next.items];
-                    if(results.nextPageToken != undefined) {
-                        self.next.next = results.nextPageToken;
-                    } else {
-                        self.next.next = null;
-                    }
-                    if(document.documentElement.clientWidth < 768) { 
-                        self.page += 1;
-                        self.render(self.items, self.page);
-                    } else if (document.documentElement.clientWidth >= 768 && document.documentElement.clientWidth < 1024){
-                        self.page += 3;
-                        self.render(self.items, Math.floor(self.page));
-                    } else if (document.documentElement.clientWidth >= 1024){
-                        self.page += 5;
-                        self.render(self.items, Math.floor(self.page));
-                    }
-                });
-            } else {
-                if(document.documentElement.clientWidth < 768) { 
-                    self.page += 1;
-                    self.render(self.items, self.page);
-                } else if (document.documentElement.clientWidth >= 768 && document.documentElement.clientWidth < 1024){
-                    self.page += 3;
-                    self.render(self.items, Math.floor(self.page));
-                } else if (document.documentElement.clientWidth >= 1024){
-                    self.page += 5;
-                    self.render(self.items, Math.floor(self.page));
-                }
-             }
-        }
-    }
-    setItems(results) {
-        let items = results.items.map((item)=> {
-            return {
-                img: item.snippet.thumbnails.high.url,
-                title: item.snippet.title,
-                name: item.snippet.channelTitle,
-                description: item.snippet.description,
-                date: item.snippet.publishedAt.slice(0,10),
-                url: 'https://www.youtube.com/watch?v='+item.id.videoId
-            }
-        });
-        return items;
-    }
-}
-
-module.exports = {
-    Youtube
-}
-
-
-
-
-
-
-
-/***/ }),
 /* 2 */
 /***/ (function(module, exports) {
 
@@ -17409,8 +17401,7 @@ module.exports = function(module) {
 /* 4 */
 /***/ (function(module, exports, __webpack_require__) {
 
-var _ = __webpack_require__(0);
-let {Youtube} = __webpack_require__(1);
+let {Youtube} = __webpack_require__(0);
 
 
 let youtube = new Youtube('AIzaSyAtQRlS7nPy56Fr6bFLwUz6Zp5GtHG7-rk');
@@ -17420,19 +17411,16 @@ window.onload = function() {
 youtube.preload();
 youtube.setListeners();
 
-
-
-
 /***/ }),
 /* 5 */
 /***/ (function(module, exports, __webpack_require__) {
 
-let _ = __webpack_require__(0);
+let _ = __webpack_require__(1);
 
 class Render{
     constructor() {
-         this.current = null;
-         this.tmpl =  _.template('<%obj.forEach(function(item){%>\
+        this.current = null;
+        this.tmpl =  _.template('<%obj.forEach(function(item){%>\
             <li class="resultContainer_resultItem">\
                 <a target="_blank" href="<%-item.url%>"><img class="resultItem_img" src="<%-item.img%>" alt=""></a>\
                 <div class="resultItem_descriptionBox">\
@@ -17445,9 +17433,9 @@ class Render{
                     <a target="_blank" href="<%-item.url%>">more &rarr;</a>\
                 </div>\
             </li><%});%>');
-         this.detected = false;
-         this.touchCoords = null;
-         this.moveTo = null;
+        this.detected = false;
+        this.touchCoords = null;
+        this.moveTo = null;
     }
     addElement(tag, parent, ...attr) {
         let elem = document.createElement(tag);
@@ -17471,8 +17459,8 @@ class Render{
         
         let searchField = this.addElement('section', container,'searchField');
         let enterQuery = this.addElement('input', searchField, null, 'enterQuery', 'text');
-        enterQuery.setAttribute('placeholder', "Are you looking for some video?");
-        let searchButton = this.addElement('button', searchField, null, 'searchButton')
+        enterQuery.setAttribute('placeholder', 'Are you looking for some video?');
+        let searchButton = this.addElement('button', searchField, null, 'searchButton');
         if(document.documentElement.clientWidth < 768) {
             searchButton.innerHTML = '&rarr;';
         } else {
@@ -17489,7 +17477,9 @@ class Render{
         let curr = this.addElement('input', pagination, 'curr', 'curr', 'button');
         curr.setAttribute('value', '1');
         let next = this.addElement('input', pagination, 'next', 'next', 'button');
-        next.setAttribute('value', 'prev');
+        next.setAttribute('value', 'next');
+        
+        let tooltip = this.addElement('div', pagination, 'tooltip', 'tooltip');
     }
     render(arr,page) {
         if(arr.length != 0) {
@@ -17501,7 +17491,7 @@ class Render{
                 return;
             }
             document.getElementById('curr').value = page +1;
-            document.getElementById("searchButton").innerHTML = '&rarr;';
+            document.getElementById('searchButton').innerHTML = '&rarr;';
             let renderArr = arr.slice(page,page+1);
             let html = this.tmpl(renderArr);
             document.getElementById('results').innerHTML = html;
@@ -17515,7 +17505,7 @@ class Render{
                 return;
             }
             document.getElementById('curr').value = Math.ceil(page/3 +1);
-            document.getElementById("searchButton").innerHTML = 'Search';
+            document.getElementById('searchButton').innerHTML = 'Search';
             let renderArr = arr.slice(page,page+3);
             let html = this.tmpl(renderArr);
             document.getElementById('results').innerHTML = html;
@@ -17529,7 +17519,7 @@ class Render{
                 return;
             }
             document.getElementById('curr').value = Math.ceil(page/5 +1);
-            document.getElementById("searchButton").innerHTML = 'Search';
+            document.getElementById('searchButton').innerHTML = 'Search';
             let renderArr = arr.slice(page, page+5);
             let html = this.tmpl(renderArr);
             document.getElementById('results').innerHTML = html;
@@ -17540,13 +17530,23 @@ class Render{
         }
     }
     swipeStart(e) {
-        if(e.path[0].id == 'enterQuery' || e.path[0].id == 'searchButton' || e.path[0].id == 'prev') {
+        if(e.path[0].id == 'enterQuery' || e.path[0].id == 'searchButton') {
             return;
         }
-        if( e.path[0].classList.contains("resultItem_img")) {
-            return e.path[0].parentElement.click();;
+        if (e.path[0].id == 'next' || e.path[0].id == 'prev') {
+            document.getElementById('tooltip').style.display = 'block';
+            document.getElementById('tooltip').style.left = e.target.offsetLeft + e.target.offsetWidth/2 + 'px';
+            if(e.target.className == 'next') {
+                document.getElementById('tooltip').innerHTML = +document.getElementById('curr').value + 1;
+            } else if(e.target.className == 'prev') {
+                document.getElementById('tooltip').innerHTML = +document.getElementById('curr').value -1;
+            }
+            return;
         }
-        if(e.path[0].tagName == "A"){
+        if( e.path[0].classList.contains('resultItem_img')) {
+            return e.path[0].parentElement.click();
+        }
+        if(e.path[0].tagName == 'A'){
             return e.path[0].click();
         }
             
@@ -17566,7 +17566,11 @@ class Render{
         }
     }
     swipeEnd(e) {
-        if(e.path[0].id == 'enterQuery' || e.path[0].id == 'searchButton' || e.path[0].id == 'prev' || e.path[0].id == 'next') {
+        if(e.path[0].id == 'enterQuery' || e.path[0].id == 'searchButton') {
+            return;
+        }
+        if (e.path[0].id == 'prev' || e.path[0].id == 'next') {
+            document.getElementById('tooltip').style.display = 'none';
             return;
         }
         if (window.getSelection) {
@@ -17607,7 +17611,7 @@ class Render{
 
 module.exports = {
     Render
-}
+};
 
 /***/ })
 /******/ ]);

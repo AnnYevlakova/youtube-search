@@ -1,9 +1,9 @@
-let _ = require("lodash");
+let _ = require('lodash');
 
 class Render{
     constructor() {
-         this.current = null;
-         this.tmpl =  _.template('<%obj.forEach(function(item){%>\
+        this.current = null;
+        this.tmpl =  _.template('<%obj.forEach(function(item){%>\
             <li class="resultContainer_resultItem">\
                 <a target="_blank" href="<%-item.url%>"><img class="resultItem_img" src="<%-item.img%>" alt=""></a>\
                 <div class="resultItem_descriptionBox">\
@@ -16,9 +16,9 @@ class Render{
                     <a target="_blank" href="<%-item.url%>">more &rarr;</a>\
                 </div>\
             </li><%});%>');
-         this.detected = false;
-         this.touchCoords = null;
-         this.moveTo = null;
+        this.detected = false;
+        this.touchCoords = null;
+        this.moveTo = null;
     }
     addElement(tag, parent, ...attr) {
         let elem = document.createElement(tag);
@@ -42,8 +42,8 @@ class Render{
         
         let searchField = this.addElement('section', container,'searchField');
         let enterQuery = this.addElement('input', searchField, null, 'enterQuery', 'text');
-        enterQuery.setAttribute('placeholder', "Are you looking for some video?");
-        let searchButton = this.addElement('button', searchField, null, 'searchButton')
+        enterQuery.setAttribute('placeholder', 'Are you looking for some video?');
+        let searchButton = this.addElement('button', searchField, null, 'searchButton');
         if(document.documentElement.clientWidth < 768) {
             searchButton.innerHTML = '&rarr;';
         } else {
@@ -60,7 +60,9 @@ class Render{
         let curr = this.addElement('input', pagination, 'curr', 'curr', 'button');
         curr.setAttribute('value', '1');
         let next = this.addElement('input', pagination, 'next', 'next', 'button');
-        next.setAttribute('value', 'prev');
+        next.setAttribute('value', 'next');
+        
+        let tooltip = this.addElement('div', pagination, 'tooltip', 'tooltip');
     }
     render(arr,page) {
         if(arr.length != 0) {
@@ -72,7 +74,7 @@ class Render{
                 return;
             }
             document.getElementById('curr').value = page +1;
-            document.getElementById("searchButton").innerHTML = '&rarr;';
+            document.getElementById('searchButton').innerHTML = '&rarr;';
             let renderArr = arr.slice(page,page+1);
             let html = this.tmpl(renderArr);
             document.getElementById('results').innerHTML = html;
@@ -86,7 +88,7 @@ class Render{
                 return;
             }
             document.getElementById('curr').value = Math.ceil(page/3 +1);
-            document.getElementById("searchButton").innerHTML = 'Search';
+            document.getElementById('searchButton').innerHTML = 'Search';
             let renderArr = arr.slice(page,page+3);
             let html = this.tmpl(renderArr);
             document.getElementById('results').innerHTML = html;
@@ -100,7 +102,7 @@ class Render{
                 return;
             }
             document.getElementById('curr').value = Math.ceil(page/5 +1);
-            document.getElementById("searchButton").innerHTML = 'Search';
+            document.getElementById('searchButton').innerHTML = 'Search';
             let renderArr = arr.slice(page, page+5);
             let html = this.tmpl(renderArr);
             document.getElementById('results').innerHTML = html;
@@ -111,13 +113,23 @@ class Render{
         }
     }
     swipeStart(e) {
-        if(e.path[0].id == 'enterQuery' || e.path[0].id == 'searchButton' || e.path[0].id == 'prev') {
+        if(e.path[0].id == 'enterQuery' || e.path[0].id == 'searchButton') {
             return;
         }
-        if( e.path[0].classList.contains("resultItem_img")) {
-            return e.path[0].parentElement.click();;
+        if (e.path[0].id == 'next' || e.path[0].id == 'prev') {
+            document.getElementById('tooltip').style.display = 'block';
+            document.getElementById('tooltip').style.left = e.target.offsetLeft + e.target.offsetWidth/2 + 'px';
+            if(e.target.className == 'next') {
+                document.getElementById('tooltip').innerHTML = +document.getElementById('curr').value + 1;
+            } else if(e.target.className == 'prev') {
+                document.getElementById('tooltip').innerHTML = +document.getElementById('curr').value -1;
+            }
+            return;
         }
-        if(e.path[0].tagName == "A"){
+        if( e.path[0].classList.contains('resultItem_img')) {
+            return e.path[0].parentElement.click();
+        }
+        if(e.path[0].tagName == 'A'){
             return e.path[0].click();
         }
             
@@ -137,7 +149,11 @@ class Render{
         }
     }
     swipeEnd(e) {
-        if(e.path[0].id == 'enterQuery' || e.path[0].id == 'searchButton' || e.path[0].id == 'prev' || e.path[0].id == 'next') {
+        if(e.path[0].id == 'enterQuery' || e.path[0].id == 'searchButton') {
+            return;
+        }
+        if (e.path[0].id == 'prev' || e.path[0].id == 'next') {
+            document.getElementById('tooltip').style.display = 'none';
             return;
         }
         if (window.getSelection) {
@@ -178,4 +194,4 @@ class Render{
 
 module.exports = {
     Render
-}
+};
