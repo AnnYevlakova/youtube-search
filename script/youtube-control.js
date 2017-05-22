@@ -89,6 +89,9 @@ class Youtube extends Render{
                     });
                 }
             }).then(function(request){
+                if(request == undefined) {
+                    return;
+                }
                 results = request.result;
                 self.next.items = self.setItems(results);
                 self.items = [...self.items, ...self.next.items];
