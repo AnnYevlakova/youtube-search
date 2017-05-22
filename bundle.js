@@ -145,11 +145,11 @@ class Youtube extends __WEBPACK_IMPORTED_MODULE_0__render__["a" /* default */]{
                 }
                 self.curr.items = self.setItems(results);
                 self.items = [...self.items, ...self.curr.items];
-                if(document.documentElement.clientWidth < 768) { 
+                if (window.matchMedia("(max-width: 768px)").matches) { 
                     self.render(self.items, self.page);
-                } else if(document.documentElement.clientWidth >= 768 && document.documentElement.clientWidth < 1024){
+                } else if (window.matchMedia("(min-width: 768px) and (max-width: 1024px)").matches){
                     self.render(self.items, Math.floor(self.page));
-                } else if(document.documentElement.clientWidth >= 1024){
+                } else if (window.matchMedia("(min-width: 1024px)").matches){
                     self.render(self.items, Math.floor(self.page));
                 }
                 if(results.nextPageToken != undefined) {
@@ -177,16 +177,16 @@ class Youtube extends __WEBPACK_IMPORTED_MODULE_0__render__["a" /* default */]{
                 self.page = 0;
                 return;
             }
-            if(document.documentElement.clientWidth < 768) { 
+            if(window.matchMedia("(max-width: 768px)").matches)  { 
                 self.page -= 1;
                 self.render(self.items, self.page);
-            } else if(document.documentElement.clientWidth >= 768 && document.documentElement.clientWidth < 1024){
+            } else if (window.matchMedia("(min-width: 768px) and (max-width: 1024px)").matches){
                 self.page -= 3;
                 if(self.page <= 0) {
                     self.page = 0;
                 }
                 self.render(self.items, Math.floor(self.page));
-            } else if(document.documentElement.clientWidth >= 1024){
+            } else if (window.matchMedia("(min-width: 1024px)").matches){
                 self.page -= 5;
                 if(self.page <= 0) {
                     self.page = 0;
@@ -226,13 +226,13 @@ class Youtube extends __WEBPACK_IMPORTED_MODULE_0__render__["a" /* default */]{
                     }
                 });
             } else {
-                if(document.documentElement.clientWidth < 768) { 
+                if (window.matchMedia("(max-width: 768px)").matches)  { 
                     self.page += 1;
                     self.render(self.items, self.page);
-                } else if (document.documentElement.clientWidth >= 768 && document.documentElement.clientWidth < 1024){
+                } else if (window.matchMedia("(min-width: 768px) and (max-width: 1024px)").matches) {
                     self.page += 3;
                     self.render(self.items, Math.floor(self.page));
-                } else if (document.documentElement.clientWidth >= 1024){
+                }  else if (window.matchMedia("(min-width: 1024px)").matches){
                     self.page += 5;
                     self.render(self.items, Math.floor(self.page));
                 }
@@ -17512,7 +17512,7 @@ class Render{
                 item.style.width = '80%';
             });
             this.current = [document.documentElement.clientWidth, page];
-        } else if (window.matchMedia("(min-width: 768px)").matches && window.matchMedia("(max-width: 1024px)").matches) {
+        } else if (window.matchMedia("(min-width: 768px) and (max-width: 1024px)").matches) {
           if(this.current != null && this.current[0] >= 768 && this.current[0] < 1024 && this.current[1] == page && page != 0) {
                 return;
             }
@@ -17525,7 +17525,7 @@ class Render{
                 item.style.width = '30%';
             });
             this.current = [document.documentElement.clientWidth, page];
-        }else if (window.matchMedia("(min-width: 1024px)").matches) {
+        } else if (window.matchMedia("(min-width: 1024px)").matches) {
             if(this.current != null && this.current[0] >= 1024 && this.current[1] == page && page != 0) {
                 return;
             }

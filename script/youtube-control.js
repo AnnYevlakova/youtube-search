@@ -71,11 +71,11 @@ class Youtube extends Render{
                 }
                 self.curr.items = self.setItems(results);
                 self.items = [...self.items, ...self.curr.items];
-                if(document.documentElement.clientWidth < 768) { 
+                if (window.matchMedia("(max-width: 768px)").matches) { 
                     self.render(self.items, self.page);
-                } else if(document.documentElement.clientWidth >= 768 && document.documentElement.clientWidth < 1024){
+                } else if (window.matchMedia("(min-width: 768px) and (max-width: 1024px)").matches){
                     self.render(self.items, Math.floor(self.page));
-                } else if(document.documentElement.clientWidth >= 1024){
+                } else if (window.matchMedia("(min-width: 1024px)").matches){
                     self.render(self.items, Math.floor(self.page));
                 }
                 if(results.nextPageToken != undefined) {
@@ -103,16 +103,16 @@ class Youtube extends Render{
                 self.page = 0;
                 return;
             }
-            if(document.documentElement.clientWidth < 768) { 
+            if(window.matchMedia("(max-width: 768px)").matches)  { 
                 self.page -= 1;
                 self.render(self.items, self.page);
-            } else if(document.documentElement.clientWidth >= 768 && document.documentElement.clientWidth < 1024){
+            } else if (window.matchMedia("(min-width: 768px) and (max-width: 1024px)").matches){
                 self.page -= 3;
                 if(self.page <= 0) {
                     self.page = 0;
                 }
                 self.render(self.items, Math.floor(self.page));
-            } else if(document.documentElement.clientWidth >= 1024){
+            } else if (window.matchMedia("(min-width: 1024px)").matches){
                 self.page -= 5;
                 if(self.page <= 0) {
                     self.page = 0;
@@ -152,13 +152,13 @@ class Youtube extends Render{
                     }
                 });
             } else {
-                if(document.documentElement.clientWidth < 768) { 
+                if (window.matchMedia("(max-width: 768px)").matches)  { 
                     self.page += 1;
                     self.render(self.items, self.page);
-                } else if (document.documentElement.clientWidth >= 768 && document.documentElement.clientWidth < 1024){
+                } else if (window.matchMedia("(min-width: 768px) and (max-width: 1024px)").matches) {
                     self.page += 3;
                     self.render(self.items, Math.floor(self.page));
-                } else if (document.documentElement.clientWidth >= 1024){
+                }  else if (window.matchMedia("(min-width: 1024px)").matches){
                     self.page += 5;
                     self.render(self.items, Math.floor(self.page));
                 }

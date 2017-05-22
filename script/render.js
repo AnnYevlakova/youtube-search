@@ -83,7 +83,7 @@ class Render{
                 item.style.width = '80%';
             });
             this.current = [document.documentElement.clientWidth, page];
-        } else if (window.matchMedia("(min-width: 768px)").matches && window.matchMedia("(max-width: 1024px)").matches) {
+        } else if (window.matchMedia("(min-width: 768px) and (max-width: 1024px)").matches) {
           if(this.current != null && this.current[0] >= 768 && this.current[0] < 1024 && this.current[1] == page && page != 0) {
                 return;
             }
@@ -96,7 +96,7 @@ class Render{
                 item.style.width = '30%';
             });
             this.current = [document.documentElement.clientWidth, page];
-        }else if (window.matchMedia("(min-width: 1024px)").matches) {
+        } else if (window.matchMedia("(min-width: 1024px)").matches) {
             if(this.current != null && this.current[0] >= 1024 && this.current[1] == page && page != 0) {
                 return;
             }
