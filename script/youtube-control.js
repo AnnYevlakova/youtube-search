@@ -66,7 +66,7 @@ class Youtube extends Render{
                 order: 'viewCount'
             }).then(function(request) {
                 results = request.result;
-                if(request.items.length == 0) {
+                if(results.items.length == 0) {
                     return;
                 }
                 self.curr.items = self.setItems(results);

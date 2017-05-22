@@ -140,7 +140,7 @@ class Youtube extends __WEBPACK_IMPORTED_MODULE_0__render__["a" /* default */]{
                 order: 'viewCount'
             }).then(function(request) {
                 results = request.result;
-                if(request.items.length == 0) {
+                if(results.items.length == 0) {
                     return;
                 }
                 self.curr.items = self.setItems(results);
