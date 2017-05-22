@@ -65,10 +65,10 @@ class Youtube extends Render{
                 q: self.query,
                 order: 'viewCount'
             }).then(function(request) {
-                if(request.result == undefined) {
+                results = request.result;
+                if(request.items.length == 0) {
                     return;
                 }
-                results = request.result;
                 self.curr.items = self.setItems(results);
                 self.items = [...self.items, ...self.curr.items];
                 if(document.documentElement.clientWidth < 768) { 
@@ -89,9 +89,6 @@ class Youtube extends Render{
                     });
                 }
             }).then(function(request){
-                if(request.result == undefined) {
-                    return;
-                }
                 results = request.result;
                 self.next.items = self.setItems(results);
                 self.items = [...self.items, ...self.next.items];
