@@ -70,8 +70,8 @@ class Render{
             document.getElementsByClassName('pagination')[0].style.display = 'block';
             
         }
-        if(document.documentElement.clientWidth < 768) {
-            if(this.current != null && this.current[0] < 768 && this.current[1] == page && page != 0) {
+        if (window.matchMedia("(max-width: 768px)").matches) {
+          if(this.current != null && this.current[0] < 768 && this.current[1] == page && page != 0) {
                 return;
             }
             document.getElementById('curr').value = page +1;
@@ -83,9 +83,8 @@ class Render{
                 item.style.width = '80%';
             });
             this.current = [document.documentElement.clientWidth, page];
-        }
-        if(document.documentElement.clientWidth >= 768 && document.documentElement.clientWidth < 1024) {
-            if(this.current != null && this.current[0] >= 768 && this.current[0] < 1024 && this.current[1] == page && page != 0) {
+        } else if (window.matchMedia("(min-width: 768px)").matches && window.matchMedia("(max-width: 1024px)").matches) {
+          if(this.current != null && this.current[0] >= 768 && this.current[0] < 1024 && this.current[1] == page && page != 0) {
                 return;
             }
             document.getElementById('curr').value = Math.ceil(page/3 +1);
@@ -97,8 +96,7 @@ class Render{
                 item.style.width = '30%';
             });
             this.current = [document.documentElement.clientWidth, page];
-        }
-        if(document.documentElement.clientWidth >= 1024) {
+        }else if (window.matchMedia("(min-width: 1024px)").matches) {
             if(this.current != null && this.current[0] >= 1024 && this.current[1] == page && page != 0) {
                 return;
             }
