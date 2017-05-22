@@ -1,4 +1,4 @@
-let _ = require('lodash');
+import _ from 'lodash';
 
 class Render{
     constructor() {
@@ -19,50 +19,51 @@ class Render{
         this.detected = false;
         this.touchCoords = null;
         this.moveTo = null;
+        this.tooltip = null;
     }
-    addElement(tag, parent, ...attr) {
-        let elem = document.createElement(tag);
-        parent.appendChild(elem);
-        if(attr == undefined) {
+    addElement(data) {
+        let elem = document.createElement(data.tag);
+        data.parent.appendChild(elem);
+        if(data.length == 2) {
             return elem;
         }
-        if(attr[0] != null) {
-            elem.classList.add(attr[0]);
+        if(data.className != undefined) {
+            elem.classList.add(data.className);
         }
-        if(attr[1] != null) {
-            elem.setAttribute('id', attr[1]);
+        if(data.id != undefined) {
+            elem.setAttribute('id', data.id);
         }
-        if(attr[2] != null) {
-            elem.setAttribute('type', attr[2]);
+        if(data.type != undefined) {
+            elem.setAttribute('type', data.type);
         }
         return elem;
     }
     preload() {
-        let container = this.addElement('section', document.getElementsByClassName('body')[0],'container');
+        let container = this.addElement({tag:'section', parent:document.getElementsByClassName('body')[0],className:'container'});
         
-        let searchField = this.addElement('section', container,'searchField');
-        let enterQuery = this.addElement('input', searchField, null, 'enterQuery', 'text');
+        let searchField = this.addElement({tag: 'section', parent:container, className:'searchField'});
+        let enterQuery = this.addElement({tag:'input', parent:searchField, id:'enterQuery', type:'text'});
         enterQuery.setAttribute('placeholder', 'Are you looking for some video?');
-        let searchButton = this.addElement('button', searchField, null, 'searchButton');
+        let searchButton = this.addElement({tag:'button', parent:searchField,id:'searchButton'});
         if(document.documentElement.clientWidth < 768) {
             searchButton.innerHTML = '&rarr;';
         } else {
             searchButton.innerHTML = 'Search';
         }
         
-        let resultContainer = this.addElement('section', container, 'resultContainer');
-        let results = this.addElement('ul', resultContainer, 'resultContainer_results', 'results');
+        let resultContainer = this.addElement({tag:'section', parent:container, className:'resultContainer'});
+        let results = this.addElement({tag:'ul', parent:resultContainer, className:'resultContainer_results', id:'results'});
         
-        let footer = this.addElement('footer', container);
-        let pagination = this.addElement('div', footer, 'pagination');
-        let prev = this.addElement('input', pagination, 'prev', 'prev', 'button');
+        let footer = this.addElement({tag:'footer', parent:container});
+        let pagination = this.addElement({tag:'div', parent:footer, className:'pagination'});
+        let prev = this.addElement({tag:'input', parent:pagination, className:'prev', id:'prev', type:'button'});
         prev.setAttribute('value', 'prev');
-        let curr = this.addElement('input', pagination, 'curr', 'curr', 'button');
+        let curr = this.addElement({tag:'input', parent:pagination, className:'curr', id:'curr', type:'button'});
         curr.setAttribute('value', '1');
-        let next = this.addElement('input', pagination, 'next', 'next', 'button');
+        let next = this.addElement({tag:'input', parent:pagination, className:'next', id:'next', type:'button'});
         next.setAttribute('value', 'next');
         
-        let tooltip = this.addElement('div', pagination, 'tooltip', 'tooltip');
+        this.tooltip = this.addElement({tag:'div', parent:pagination, className:'tooltip', id:'tooltip'});
     }
     render(arr,page) {
         if(arr.length != 0) {
@@ -78,7 +79,7 @@ class Render{
             let renderArr = arr.slice(page,page+1);
             let html = this.tmpl(renderArr);
             document.getElementById('results').innerHTML = html;
-            [].forEach.call(document.getElementsByClassName('resultContainer_resultItem'),(item)=> {
+            Array.from(document.getElementsByClassName('resultContainer_resultItem'),(item)=> {
                 item.style.width = '80%';
             });
             this.current = [document.documentElement.clientWidth, page];
@@ -92,7 +93,7 @@ class Render{
             let renderArr = arr.slice(page,page+3);
             let html = this.tmpl(renderArr);
             document.getElementById('results').innerHTML = html;
-            [].forEach.call(document.getElementsByClassName('resultContainer_resultItem'),(item)=> {
+            Array.from(document.getElementsByClassName('resultContainer_resultItem'),(item)=> {
                 item.style.width = '30%';
             });
             this.current = [document.documentElement.clientWidth, page];
@@ -106,7 +107,7 @@ class Render{
             let renderArr = arr.slice(page, page+5);
             let html = this.tmpl(renderArr);
             document.getElementById('results').innerHTML = html;
-            [].forEach.call(document.getElementsByClassName('resultContainer_resultItem'),(item)=> {
+            Array.from(document.getElementsByClassName('resultContainer_resultItem'),(item)=> {
                 item.style.width = '18%';
             });
             this.current = [document.documentElement.clientWidth, page];
@@ -117,12 +118,12 @@ class Render{
             return;
         }
         if (e.path[0].id == 'next' || e.path[0].id == 'prev') {
-            document.getElementById('tooltip').style.display = 'block';
-            document.getElementById('tooltip').style.left = e.target.offsetLeft + e.target.offsetWidth/2 + 'px';
+            this.tooltip.style.display = 'block';
+            this.tooltip.style.left = e.target.offsetLeft + e.target.offsetWidth/2 + 'px';
             if(e.target.className == 'next') {
-                document.getElementById('tooltip').innerHTML = +document.getElementById('curr').value + 1;
+                this.tooltip.innerHTML = +document.getElementById('curr').value + 1;
             } else if(e.target.className == 'prev') {
-                document.getElementById('tooltip').innerHTML = +document.getElementById('curr').value -1;
+                this.tooltip.innerHTML = +document.getElementById('curr').value -1;
             }
             return;
         }
@@ -153,7 +154,7 @@ class Render{
             return;
         }
         if (e.path[0].id == 'prev' || e.path[0].id == 'next') {
-            document.getElementById('tooltip').style.display = 'none';
+            this.tooltip.style.display = 'none';
             return;
         }
         if (window.getSelection) {
@@ -192,6 +193,4 @@ class Render{
 
 
 
-module.exports = {
-    Render
-};
+export default Render;

@@ -1,4 +1,4 @@
-let {Render} = require('./render');
+import Render from './render';
 
 class Youtube extends Render{
     constructor(key) {
@@ -29,24 +29,24 @@ class Youtube extends Render{
         gapi.client.load('youtube', 'v3', function(){});
     }
     setListeners() {
-        let self = this; document.getElementById('next').addEventListener('click', function() {self.search(0, self.next.next, self);}); 
-        document.getElementById('prev').addEventListener('click', function() {self.search(self.prev.prev, 0, self);}); 
-        document.getElementById('searchButton').addEventListener('click', function() {self.search(0,0, self);});
-        window.addEventListener('resize', function(){self.render(self.items, self.page);});
-        window.addEventListener('touchstart', function(e){self.swipeStart(e);});
-        window.addEventListener('mousedown', function(e){self.swipeStart(e);});
-        window.addEventListener('touchend', function(e){self.swipeEnd(e);});
-        window.addEventListener('mouseup', function(e){self.swipeEnd(e);});
-        window.addEventListener('keydown', function(e){
+        document.getElementById('next').addEventListener('click', () => {this.search(0, this.next.next, this);}); 
+        document.getElementById('prev').addEventListener('click', () => {this.search(this.prev.prev, 0, this);}); 
+        document.getElementById('searchButton').addEventListener('click', () => {this.search(0,0, this);});
+        window.addEventListener('resize', () =>{this.render(this.items, this.page);});
+        window.addEventListener('touchstart', (e) =>{this.swipeStart(e);});
+        window.addEventListener('mousedown', (e) =>{this.swipeStart(e);});
+        window.addEventListener('touchend', (e) =>{this.swipeEnd(e);});
+        window.addEventListener('mouseup', (e) =>{this.swipeEnd(e);});
+        window.addEventListener('keydown', (e) =>{
             if(e.keyCode == 13) {
                 document.getElementById('searchButton').click();
             }
         });
-        document.getElementById('enterQuery').addEventListener('focus',function(){
+        document.getElementById('enterQuery').addEventListener('focus', function(){
             this.setAttribute('placeholder','. . .');
             this.value = '';
         });
-        document.getElementById('enterQuery').addEventListener('blur',function(){
+        document.getElementById('enterQuery').addEventListener('blur', function(){
             this.setAttribute('placeholder','Are you looking for some video?');
         });
     }
@@ -65,6 +65,9 @@ class Youtube extends Render{
                 q: self.query,
                 order: 'viewCount'
             }).then(function(request) {
+                if(request.result == undefined) {
+                    return;
+                }
                 results = request.result;
                 self.curr.items = self.setItems(results);
                 self.items = [...self.items, ...self.curr.items];
@@ -174,6 +177,4 @@ class Youtube extends Render{
     }
 }
 
-module.exports = {
-    Youtube
-};
+export default Youtube;

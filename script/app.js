@@ -1,4 +1,4 @@
-let {Youtube} = require('./youtube-control');
+import Youtube from './youtube-control';
 
 
 let youtube = new Youtube('AIzaSyAtQRlS7nPy56Fr6bFLwUz6Zp5GtHG7-rk');
