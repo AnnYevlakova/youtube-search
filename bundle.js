@@ -163,6 +163,9 @@ class Youtube extends __WEBPACK_IMPORTED_MODULE_0__render__["a" /* default */]{
                     });
                 }
             }).then(function(request){
+                if(request.result == undefined) {
+                    return;
+                }
                 results = request.result;
                 self.next.items = self.setItems(results);
                 self.items = [...self.items, ...self.next.items];
